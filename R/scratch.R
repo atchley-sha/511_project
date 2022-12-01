@@ -7,7 +7,13 @@ crash <- read_csv("data/TIM 2018 and 2022 Data.csv") %>%
     TRUE ~ `Crash Type`),
     Year = as.character(Year),
     time = `RCT for IMT` %>% as.numeric()
-  )
+  ) 
+
+crash %>% 
+  select(Year, Date, Time, `Crash Type`, `Number of IMT Teams`, `Response Time IMT`, `RCT for IMT`, `Lanes at Bottleneck`, `Number of Lanes Closed`, `Affected Volume`, `Total Excess Travel Time`)
+
+crash %>% 
+  ggpairs(columns = )
 
 model <- crash %>% 
   lm(
