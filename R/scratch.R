@@ -6,14 +6,17 @@ crash <- read_csv("data/TIM 2018 and 2022 Data.csv") %>%
     `Crash Type` == "PI crash" ~ "PI Crash",
     TRUE ~ `Crash Type`),
     Year = as.character(Year),
-    time = `RCT for IMT` %>% as.numeric()
-  ) 
-
-crash %>% 
+    `RCT for IMT` = `RCT for IMT` %>% as.numeric(),
+    `Response Time IMT` = `Response Time IMT` %>% 
+      as.difftime() %>% 
+      as.numeric(),
+    Time = Time %>% as.numeric()
+  ) %>% 
   select(Year, Date, Time, `Crash Type`, `Number of IMT Teams`, `Response Time IMT`, `RCT for IMT`, `Lanes at Bottleneck`, `Number of Lanes Closed`, `Affected Volume`, `Total Excess Travel Time`)
 
 crash %>% 
-  ggpairs(columns = )
+  select(-Date) %>% 
+  ggpairs(aes(color = Year), legend = c(1,1))
 
 model <- crash %>% 
   lm(
