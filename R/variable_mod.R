@@ -50,9 +50,15 @@ compare_log_plot <- function(term){
   p / p_log
 }
 
-compare_log_plot(Delay) | compare_log_plot(Duration)
+dur <- crash %>%
+  ggplot(aes(x = Duration, y = log(Delay))) +
+  geom_point() +
+  theme_pander()
 
-compare_log_plot(RT)
-compare_log_plot(RCT)
-compare_log_plot(Duration)
+dur_log <- crash %>%
+  ggplot(aes(x = log(Duration), y = log(Delay))) +
+  geom_point() +
+  theme_pander()
+
+compare_log_plot(Delay) | (dur / dur_log)
 
