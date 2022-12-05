@@ -28,7 +28,7 @@ data_targets <- tar_plan(
   crash_filter = crash_pred %>% 
     filter(Type != "Fatal"),
   crash_final = clean_data(crashfile) %>% 
-    transmute(log_Delay = log(Delay), Year, LR, Type)
+    transmute(log_Delay = log(Delay), Year, LR, RT)
 )
 
 model_targets <- tar_plan(
@@ -37,7 +37,11 @@ model_targets <- tar_plan(
   pred_model = lm(log(Delay) ~ .^2, data = crash_pred),
   step_pred = step(pred_model, k = log(nrow(crash_pred))),
   
-  final_model = lm(log_Delay ~ ., data = crash_final)
+  final_model = lm(log_Delay ~ ., data = crash_final),
+  final_rsq = final_model %>% summary() %>% {.$r.squared},
+  
+  pred_rsq = step_pred %>% summary() %>% {.$r.squared},
+  full_rsq = step_full %>% summary() %>% {.$r.squared}
 )
 
 viz_targets <- tar_plan(
@@ -45,10 +49,18 @@ viz_targets <- tar_plan(
   log_comparison = compare_logs(crash),
   final_pairs = plot_pairs(crash_final),
   
-  full_table = make_model_table(step_full, digits = c(NA,2,3,4)),
-  pred_table = make_model_table(step_pred, digits = c(NA,2,3,4)),
-  final_table = make_model_table(final_model, digits = c(NA,2,3,4))
+  full_table = make_model_table(step_full, digits = c(NA,2,3,2,4)),
+  pred_table = make_model_table(step_pred, digits = c(NA,2,3,2,4)),
+  final_table = make_model_table(final_model, digits = c(NA,2,3,2,4)),
   
+  rt_plot = one_pair_plot(crash, aes(x = RT, y = log(Delay)), "image/rt.png"),
+  teams_plot = one_pair_plot(crash, aes(x = Teams, y = log(Delay)), "image/teams.png"),
+  duration_plot = one_pair_plot(crash, aes(x = log(Duration), y = log(Delay)), "image/duration.png"),
+  
+  crash_type_plot = plot_types(crash),
+  
+  fit_plot = plot_fit(crash, final_model),
+  resid_plot = plot_residuals(crash, final_model)
 )
 
 #### Run all targets ####

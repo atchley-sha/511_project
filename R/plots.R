@@ -96,4 +96,69 @@ plot_pairs <- function(crash){
   
   plot
 }
+
+
+one_pair_plot <- function(data, aes, file, ...){
   
+  plot <- data %>% 
+    ggplot(mapping = aes) +
+    geom_point() +
+    geom_smooth(method = 'lm', se = FALSE) +
+    theme_bw()
+  
+  ggsave(file, plot, ...)
+  
+  plot
+}
+
+
+plot_fit <- function(data, model){
+  
+  plot <- data %>% 
+    mutate(pred = fitted(model)) %>% 
+    ggplot(aes(x = pred, y = log(Delay))) + 
+    geom_point() +
+    geom_smooth(method = 'lm', se = FALSE) +
+    theme_bw() +
+    labs(x = "Fitted log(Delay)", y = "Actual log(Delay)")
+  
+  ggsave("image/fit.png", plot)
+  
+  plot
+  
+}
+
+plot_residuals <- function(data, model){
+  
+  plot <- data %>% 
+    mutate(resid = residuals(model),
+           pred = fitted(model)) %>% 
+    ggplot(aes(x = pred, y = resid)) + 
+    geom_point() +
+    geom_smooth(method = 'lm', se = FALSE) +
+    theme_bw() +
+    labs(x = "Fitted log(Delay)", y = "Residuals")
+  
+  ggsave("image/residuals.png", plot)
+  
+  plot
+  
+}
+
+
+plot_types <- function(crash){
+  
+  plot <- crash %>% 
+    ggplot(aes(x = Type)) +
+    geom_bar() +
+    geom_text(stat='count',aes(label=after_stat(count)), vjust = -1) +
+    theme_bw() +
+    labs(x = "Crash Type") +
+    expand_limits(y = c(NA,155)) +
+    theme(axis.title.y = element_blank())
+  
+  ggsave("image/types.png", plot,
+         width = 6, height = 4, units = "in")
+  
+  plot
+}
